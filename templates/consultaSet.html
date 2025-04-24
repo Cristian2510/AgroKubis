@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Facturas por CDC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultaSet.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Consulta de Facturas por CDC</h1>
+
+        <!-- Sección 1: Buscar CDCs -->
+        <div class="section">
+            <h2>1. Buscar CDCs</h2>
+            <form id="buscarForm">
+                <label for="desde">Desde:</label>
+                <input type="date" id="desde" name="desde" required>
+                <label for="hasta">Hasta:</label>
+                <input type="date" id="hasta" name="hasta" required>
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
+
+        <!-- Sección 2: Consultar en la API -->
+        <div class="section">
+            <h2>2. Consultar en la API</h2>
+            <textarea id="cdcList" name="cdcList" rows="10" placeholder="Aquí aparecerán los CDCs o puedes pegarlos..." required></textarea>
+            <button id="consultarButton">Consultar</button>
+        </div>
+
+        <!-- Sección 3: Consultar en ekuatia -->
+        <div class="section">
+            <h2>3. Consultar en ekuatia</h2>
+            <form id="seleniumForm">
+                <label for="cdc">Ingrese un CDC:</label>
+                <input type="text" id="cdc" name="cdc" placeholder="Ingrese el CDC aquí..." required>
+                <button type="submit">Consultar con Selenium</button>
+            </form>
+            <div id="seleniumResultado" class="resultado">
+                <h3>Resultado de Selenium</h3>
+                <pre id="seleniumTexto"></pre>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div id="resultado" class="resultado">
+            <h2>Resultados</h2>
+            <pre id="resultadoTexto"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Buscar CDCs por rango de fechas
+        document.getElementById("buscarForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const desde = document.getElementById("desde").value;
+            const hasta = document.getElementById("hasta").value;
+
+            try {
+                const response = await fetch("/buscar_cdcs", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ desde, hasta })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById("cdcList").value = data.cdcs.join("\n");
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert("Ocurrió un error al buscar los CDCs.");
+                console.error(error);
+            }
+        });
+
+        // Consultar en la API
+        document.getElementById("consultarButton").addEventListener("click", async function() {
+            const cdcList = document.getElementById("cdcList").value.split("\n").map(cdc => cdc.trim()).filter(cdc => cdc);
+            if (cdcList.length === 0) {
+                alert("Por favor, ingrese al menos un CDC.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/consultar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ cdcList })
+                });
+
+                const data = await response.json();
+                const resultadoTexto = document.getElementById("resultadoTexto");
+                if (response.ok) {
+                    resultadoTexto.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    resultadoTexto.textContent = `Error: ${data.error}\n${data.mensaje || ""}`;
+                }
+            } catch (error) {
+                alert("Ocurrió un error al realizar la consulta.");
+                console.error(error);
+            }
+        });
+
+        // Consultar con Selenium
+        document.getElementById("seleniumForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const cdc = document.getElementById("cdc").value.trim();
+
+            if (!cdc) {
+                alert("Por favor, ingrese un CDC válido.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/consultar_selenium", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ cdc })
+                });
+
+                const data = await response.json();
+                const seleniumTexto = document.getElementById("seleniumTexto");
+
+                if (response.ok) {
+                    seleniumTexto.textContent = data.mensaje;
+                } else {
+                    seleniumTexto.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                alert("Ocurrió un error al realizar la consulta con Selenium.");
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>

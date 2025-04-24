@@ -1,0 +1,2 @@
+API_KEY = "api_key_771326DB-4D57-4346-A8BC-528CAD5FB9CB"
+TENANT_ID = "agrokubissa"

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú Principal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="menu-wrapper">
+    <h1>🧾 Sistema de Consultas</h1>
+
+    <div class="tarjetas-menu">
+      <a href="{{ url_for('vista_index') }}" class="tarjeta">
+        <i class="fas fa-file-invoice"></i>
+        <span>Consulta CDC</span>
+      </a>
+
+      <a href="{{ url_for('vista_consulta_set') }}" class="tarjeta">
+        <i class="fas fa-file-signature"></i>
+        <span>Consulta SET</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

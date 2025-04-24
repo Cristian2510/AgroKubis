@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta CDC</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Consulta de Facturas por CDC</h1>
+
+    <!-- 🔍 Paso 1: Consulta por Fecha -->
+    <h2>1. Buscar CDCs</h2>
+    <div class="fila-flex">
+      <label for="desde">Desde:</label>
+      <input type="date" id="desde">
+      <label for="hasta">Hasta:</label>
+      <input type="date" id="hasta">
+      <button onclick="buscarCdcsPorFecha()">Buscar</button>
+    </div>
+
+    <!-- 🧾 Paso 2: Consulta Manual -->
+    <h2>2. Consultar en la API</h2>
+    <textarea id="cdcInput" placeholder="Aquí aparecerán los CDCs o puedes pegarlos..."></textarea>
+    <button onclick="consultarCDC()">Consultar</button>
+
+    <!-- 📋 Resultado e Informe -->
+    <div class="fila-flex-between">
+      <h2>Resultado</h2>
+      <div class="botones-exportar">
+        <a href="/informe/excel" target="_blank"><button>📥 Excel</button></a>
+        <a href="/informe/pdf" target="_blank"><button>📄 PDF</button></a>
+      </div>
+    </div>
+
+    <textarea id="resultado" readonly placeholder="Aquí se mostrará el resultado..."></textarea>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/consulta.js') }}"></script>
+</body>
+</html>
