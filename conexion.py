@@ -1,14 +1,14 @@
 import fdb
 
-# Configuración de la base de datos
-dsn = r'170.82.145.121:\Sistema Gol\Database\DATABASE.FDB'
+# Configuración de la base de datos (servidor público)
+dsn = '170.82.145.121/3050:C:/Sistema Gol/Database/DATABASE.FDB'
 user = 'SYSDBA'
 password = 'di20071987'
 charset = 'NONE'
-fb_library_name = r'C:\Program Files\Firebird\Firebird_3_0\bin\fbclient.dll'
 
 def obtener_cdcs_por_fecha(desde, hasta):
-    fdb.load_api(fb_library_name)
+    # ❌ Elimina fdb.load_api, no funciona en Render
+    # fdb.load_api(fb_library_name)
 
     con = fdb.connect(
         dsn=dsn,
