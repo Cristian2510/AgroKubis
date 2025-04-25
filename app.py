@@ -18,6 +18,22 @@ import time
 
 app = Flask(__name__)
 
+# ✅ NUEVA RUTA PARA PROBAR CONEXIÓN
+@app.route("/test_conexion")
+def test_conexion():
+    try:
+        registros = obtener_cdcs_por_fecha("2025-01-01", "2025-01-02")
+        return jsonify({
+            "estado": "ok",
+            "mensaje": "Conexión a Firebird exitosa",
+            "cantidad_resultados": len(registros)
+        })
+    except Exception as e:
+        return jsonify({
+            "estado": "error",
+            "mensaje": str(e)
+        }), 500
+
 # Menú y vistas
 @app.route("/menu")
 def menu():
@@ -34,7 +50,6 @@ def vista_consulta_set():
 @app.route("/")
 def redireccion_a_menu():
     return render_template("menu.html")
-
 
 # Consulta CDC sin guardar archivos
 @app.route("/consultar", methods=["POST"])
@@ -213,27 +228,20 @@ def consultar_selenium():
         return jsonify({"error": "No se proporcionó un CDC válido"}), 400
 
     try:
-        # Configura el driver (asegúrate de tener el driver de tu navegador instalado)
-        driver = webdriver.Chrome()  # Cambia a tu navegador preferido
+        driver = webdriver.Chrome()
         driver.get("https://ekuatia.set.gov.py/consultas/")
-
-        # Esperar a que el campo de entrada esté presente
         cdc_input = WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//input[@placeholder='CDC']"))
         )
         cdc_input.send_keys(cdc_value)
 
-        # Resolver el reCAPTCHA manualmente
         print("Por favor, resuelve el reCAPTCHA manualmente.")
-        time.sleep(15)  # Tiempo para resolver el reCAPTCHA
+        time.sleep(15)
 
-        # Hacer clic en el botón "Consultar"
         buscar_button = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Consultar')]"))
         )
         buscar_button.click()
-
-        # Esperar los resultados
         time.sleep(5)
 
         driver.quit()
@@ -241,6 +249,6 @@ def consultar_selenium():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-if __name__ == "__main__":
-    app.run(debug=True)
+# 👇 ESTA PARTE ES PARA PRODUCCIÓN CON GUNICORN (NO USAR app.run)
+#if __name__ == "__main__":
+#    app.run(debug=True)
