@@ -19,20 +19,16 @@ import time
 app = Flask(__name__)
 
 # ✅ NUEVA RUTA PARA PROBAR CONEXIÓN
-@app.route("/test_conexion")
+@app.route("/test-conexion")
 def test_conexion():
+    from datetime import datetime
     try:
-        registros = obtener_cdcs_por_fecha("2025-01-01", "2025-01-02")
-        return jsonify({
-            "estado": "ok",
-            "mensaje": "Conexión a Firebird exitosa",
-            "cantidad_resultados": len(registros)
-        })
+        from conexion import obtener_cdcs_por_fecha
+        hoy = datetime.today().strftime('%Y-%m-%d')
+        obtener_cdcs_por_fecha(hoy, hoy)
+        return jsonify({"ok": True})
     except Exception as e:
-        return jsonify({
-            "estado": "error",
-            "mensaje": str(e)
-        }), 500
+        return jsonify({"ok": False, "error": str(e)})
 
 # Menú y vistas
 @app.route("/menu")
@@ -248,18 +244,6 @@ def consultar_selenium():
         return jsonify({"mensaje": "Consulta realizada con éxito. Verifica los resultados en el navegador."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route("/test-conexion")
-def test_conexion():
-    from datetime import datetime
-    try:
-        from conexion import obtener_cdcs_por_fecha
-        hoy = datetime.today().strftime('%Y-%m-%d')
-        obtener_cdcs_por_fecha(hoy, hoy)
-        return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e)})
-
 
 
 # 👇 ESTA PARTE ES PARA PRODUCCIÓN CON GUNICORN (NO USAR app.run)
