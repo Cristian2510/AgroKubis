@@ -249,8 +249,9 @@ def consultar_selenium():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/prueba-conexion")
-def prueba_conexion():
+@app.route("/test-conexion")
+def test_conexion():
+    from datetime import datetime
     try:
         from conexion import obtener_cdcs_por_fecha
         hoy = datetime.today().strftime('%Y-%m-%d')
@@ -258,7 +259,6 @@ def prueba_conexion():
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)})
-
 
 
 # 👇 ESTA PARTE ES PARA PRODUCCIÓN CON GUNICORN (NO USAR app.run)
