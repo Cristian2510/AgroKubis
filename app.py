@@ -261,6 +261,7 @@ def test_conexion():
         return jsonify({"ok": False, "error": str(e)})
 
 
+
 # 👇 ESTA PARTE ES PARA PRODUCCIÓN CON GUNICORN (NO USAR app.run)
 #if __name__ == "__main__":
 #    app.run(debug=True)
