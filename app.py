@@ -78,22 +78,27 @@ def consultar():
 # 🔍 CONSULTA POR FECHA USANDO API EXTERNA
 @app.route("/buscar_cdcs", methods=["POST"])
 def buscar_cdcs():
-    data = request.json
+    data = request.get_json()
     desde = data.get("desde")
     hasta = data.get("hasta")
 
     try:
-        url = f"http://170.82.145.121:5000/api/cdc?desde={desde}&hasta={hasta}"
-        response = requests.get(url)
-        json_data = response.json()
+        # Reemplazamos por tu IP real y puerto de la API local
+        response = requests.get(
+            "http://170.82.145.121:5000/api/cdc",
+            params={"desde": desde, "hasta": hasta},
+            timeout=10
+        )
+        result = response.json()
 
-        if not json_data.get("ok"):
-            return jsonify({"error": json_data.get("error")}), 500
+        if result.get("ok"):
+            cdcs = [r["cdc"] for r in result["resultados"]]
+            return jsonify({"cdcs": cdcs})
+        else:
+            return jsonify({"error": result.get("error", "Error desconocido")}), 500
 
-        cdc_list = [fila["cdc"] for fila in json_data.get("resultados", [])]
-        return jsonify({"cdcs": cdc_list})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"No se pudo contactar con la API Firebird: {e}"}), 500
 
 # 📦 EXPORTACIÓN JSON
 @app.route("/informe", methods=["GET"])
