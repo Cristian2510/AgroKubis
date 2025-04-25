@@ -20,7 +20,27 @@
         <i class="fas fa-file-signature"></i>
         <span>Consulta SET</span>
       </a>
+
+      <a href="#" class="tarjeta" onclick="testConexion()">
+        <i class="fas fa-plug"></i>
+        <span>Test de Conexión</span>
+      </a>
+      
     </div>
   </div>
+
+  <script>
+    function testConexion() {
+      fetch('/test-conexion')
+        .then(res => res.json())
+        .then(data => {
+          alert(data.ok ? '✅ Conexión exitosa con Firebird' : `❌ Error: ${data.error}`);
+        })
+        .catch(err => {
+          alert('❌ No se pudo contactar con el servidor: ' + err.message);
+        });
+    }
+  </script>
+  
 </body>
 </html>
