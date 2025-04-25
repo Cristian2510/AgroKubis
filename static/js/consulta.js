@@ -78,3 +78,17 @@ function buscarCdcsPorFecha() {
       });
   }
   
+  fetch("/buscar_cdcs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ desde, hasta })
+  })
+  .then(async res => {
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await res.text();
+      throw new Error("Respuesta no es JSON: " + text);
+    }
+    return res.json();
+  })
+  
