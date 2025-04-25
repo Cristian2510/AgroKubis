@@ -1,8 +1,8 @@
-flask
+Flask
 requests
-fdb
-gunicorn
 pandas
 reportlab
 selenium
+fdb
+gunicorn
 openpyxl

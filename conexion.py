@@ -1,17 +1,15 @@
 import fdb
-import os
 import platform
 
-# Configuración de la base de datos
 dsn = '170.82.145.121/3050:C:/Sistema Gol/Database/DATABASE.FDB'
 user = 'SYSDBA'
 password = 'di20071987'
 charset = 'NONE'
 
-# Solo cargar la DLL en Windows
+# Detectar entorno para cargar la librería si estás en Windows
 if platform.system() == 'Windows':
-    fb_library_name = r'C:\Program Files\Firebird\Firebird_3_0\bin\fbclient.dll'
-    fdb.load_api(fb_library_name)
+    fdb.load_api('C:/Program Files/Firebird/Firebird_3_0/bin/fbclient.dll')
+# No cargar librería en Linux (Railway lo usará por defecto si está instalada)
 
 def obtener_cdcs_por_fecha(desde, hasta):
     con = fdb.connect(
@@ -20,18 +18,13 @@ def obtener_cdcs_por_fecha(desde, hasta):
         password=password,
         charset=charset
     )
-
     cur = con.cursor()
-
-    query = """
+    cur.execute("""
         SELECT DATA, LANCAMENTO, CDC
         FROM faturas_crecon
         WHERE ESTADO_SET = '3'
         AND DATA BETWEEN ? AND ?
-    """
-
-    cur.execute(query, (desde, hasta))
+    """, (desde, hasta))
     resultados = cur.fetchall()
-
     con.close()
     return resultados
