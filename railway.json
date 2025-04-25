@@ -1,0 +1,13 @@
+{
+    "build": {
+      "env": {
+        "PYTHON_VERSION": "3.11"
+      },
+      "scripts": [
+        "apt-get update",
+        "apt-get install -y firebird3.0-utils firebird3.0-dev"
+      ]
+    },
+    "start": "gunicorn app:app"
+  }
+  
