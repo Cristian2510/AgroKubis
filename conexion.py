@@ -1,30 +1,15 @@
-import fdb
-import platform
+import requests
 
-dsn = '170.82.145.121/3050:C:/Sistema Gol/Database/DATABASE.FDB'
-user = 'SYSDBA'
-password = 'di20071987'
-charset = 'NONE'
-
-# Detectar entorno para cargar la librería si estás en Windows
-if platform.system() == 'Windows':
-    fdb.load_api('C:/Program Files/Firebird/Firebird_3_0/bin/fbclient.dll')
-# No cargar librería en Linux (Railway lo usará por defecto si está instalada)
+API_FIREBIRD = "http://170.82.145.121:5000/api/cdc"
 
 def obtener_cdcs_por_fecha(desde, hasta):
-    con = fdb.connect(
-        dsn=dsn,
-        user=user,
-        password=password,
-        charset=charset
-    )
-    cur = con.cursor()
-    cur.execute("""
-        SELECT DATA, LANCAMENTO, CDC
-        FROM faturas_crecon
-        WHERE ESTADO_SET = '3'
-        AND DATA BETWEEN ? AND ?
-    """, (desde, hasta))
-    resultados = cur.fetchall()
-    con.close()
-    return resultados
+    try:
+        response = requests.get(API_FIREBIRD, params={"desde": desde, "hasta": hasta})
+        datos = response.json()
+
+        if datos.get("ok"):
+            return [(d["fecha"], d["lanzamiento"], d["cdc"]) for d in datos["resultados"]]
+        else:
+            raise Exception(datos.get("error", "Error desconocido en la API local"))
+    except Exception as e:
+        raise Exception(f"Error consultando API Firebird: {e}")
