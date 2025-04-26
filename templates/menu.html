@@ -1,44 +1,34 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Menú Principal</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body>
-  <div class="menu-wrapper">
-    <h1>🧾 Sistema de Consultas</h1>
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
-    <div class="tarjetas-menu">
-      <a href="{{ url_for('vista_index') }}" class="tarjeta">
-        <i class="fas fa-file-invoice"></i>
-        <span>Consulta CDC</span>
-      </a>
+app = Flask(__name__)
+app.secret_key = 'clave_secreta_segura'  # Cambia esto por una clave segura
 
-      <a href="{{ url_for('vista_consulta_set') }}" class="tarjeta">
-        <i class="fas fa-file-signature"></i>
-        <span>Consulta SET</span>
-      </a>
+# Credenciales de usuario
+USUARIO = "Kubis"
+CONTRASEÑA = "GustavoKubis"
 
-      <a href="#" class="tarjeta" onclick="testConexion()">
-        <i class="fas fa-plug"></i>
-        <span>Test de Conexión</span>
-      </a>
-    </div>
-  </div>
+@app.route("/login", methods=["POST"])
+def login():
+    username = request.form.get("username")
+    password = request.form.get("password")
 
-  <script>
-    function testConexion() {
-      fetch('/test-conexion')
-        .then(res => res.json())
-        .then(data => {
-          alert(data.ok ? '✅ Conexión exitosa con Firebird' : `❌ Error: ${data.error}`);
-        })
-        .catch(err => {
-          alert('❌ No se pudo contactar con el servidor: ' + err.message);
-        });
-    }
-  </script>
-</body>
-</html>
+    if username == USUARIO and password == CONTRASEÑA:
+        session["logged_in"] = True
+        return redirect(url_for("menu"))
+    else:
+        return "❌ Usuario o contraseña incorrectos", 401
+
+@app.route("/menu")
+def menu():
+    if not session.get("logged_in"):
+        return redirect(url_for("login_page"))
+    return render_template("menu.html")
+
+@app.route("/login-page")
+def login_page():
+    return render_template("menu.html")  # Usa el mismo archivo para el formulario de inicio de sesión
+
+@app.route("/logout")
+def logout():
+    session.pop("logged_in", None)
+    return redirect(url_for("login_page"))
