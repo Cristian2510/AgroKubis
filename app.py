@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, session
 import requests
 import config
 import pandas as pd
@@ -11,6 +11,37 @@ import io
 import time
 
 app = Flask(__name__)
+app.secret_key = 'clave_secreta_segura'  # Cambia esto por una clave segura
+
+# Credenciales de usuario
+USUARIO = "Kubis"
+CONTRASEÑA = "GustavoKubis"
+
+@app.route("/login", methods=["POST"])
+def login():
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    if username == USUARIO and password == CONTRASEÑA:
+        session["logged_in"] = True
+        return redirect(url_for("menu"))
+    else:
+        return "❌ Usuario o contraseña incorrectos", 401
+
+@app.route("/menu")
+def menu():
+    if not session.get("logged_in"):
+        return redirect(url_for("login_page"))
+    return render_template("menu.html")
+
+@app.route("/login-page")
+def login_page():
+    return render_template("menu.html")  # Usa el mismo archivo para el formulario de inicio de sesión
+
+@app.route("/logout")
+def logout():
+    session.pop("logged_in", None)
+    return redirect(url_for("login_page"))
 
 # ✅ RUTA DE TEST DE CONEXIÓN A API EXTERNA
 @app.route("/test-conexion")
@@ -26,10 +57,6 @@ def test_conexion():
         return jsonify({"ok": False, "error": str(e)})
 
 # 🧾 MENÚ Y VISTAS
-@app.route("/menu")
-def menu():
-    return render_template("menu.html")
-
 @app.route("/index")
 def vista_index():
     return render_template("index.html")
